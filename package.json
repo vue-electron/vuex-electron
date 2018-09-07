@@ -1,0 +1,28 @@
+{
+  "name": "vuex-electron",
+  "version": "0.1.0",
+  "description": "Vuex Electron",
+  "keywords": [
+    "vue",
+    "vuex",
+    "electron"
+  ],
+  "main": "./dist/index.js",
+  "repository": "https://github.com/vuex-electron/vuex-electron",
+  "homepage": "https://github.com/vuex-electron/vuex-electron",
+  "bugs": "https://github.com/vuex-electron/vuex-electron/issues",
+  "author": "Andrew Emelianenko <emelianenko.web@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "babel src -d dist",
+    "watch": "babel src -d dist --watch"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-plugin-add-module-exports": "^0.2.1"
+  },
+  "dependencies": {}
+}
