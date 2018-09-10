@@ -1,6 +1,6 @@
 {
   "name": "vuex-electron",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vuex Electron",
   "keywords": [
     "vue",
@@ -24,5 +24,9 @@
     "@babel/preset-env": "^7.0.0",
     "babel-plugin-add-module-exports": "^0.2.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "deepmerge": "^2.1.1",
+    "electron": "^2.0.8",
+    "electron-store": "^2.0.0"
+  }
 }
