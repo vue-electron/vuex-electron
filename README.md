@@ -33,7 +33,9 @@ export default new Vuex.Store({
 
 ### IMPORTANT
 
-For proper working of such package, you shouldn't use `store.commit` outside of actions.
+> For proper working of such package, you shouldn't use `store.commit` outside of actions.
+
+### Options
 
 Available options for `createPersistedState()`
 
@@ -59,7 +61,7 @@ createPersistedState({
 })
 ```
 
-# Development Roadmap
+## Development Roadmap
 
 - [ ] Configure ESLint and Prettier
 - [ ] Minify package
