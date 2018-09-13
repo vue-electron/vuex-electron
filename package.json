@@ -15,18 +15,41 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "babel src -d dist",
-    "watch": "babel src -d dist --watch"
+    "prebuild": "rm -rf dist && mkdir dist",
+    "build": "babel src -d dist --env-name production",
+    "watch": "babel src -d dist --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "lint && jest && bundlesize"
   },
+  "bundlesize": [
+    {
+      "path": "./dist/**/*.js",
+      "maxSize": "1 kB"
+    }
+  ],
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
-    "babel-plugin-add-module-exports": "^0.2.1"
+    "babel-core": "^7.0.0-0",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "^23.6.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-minify": "^0.4.3",
+    "bundlesize": "^0.17.0",
+    "eslint": "^5.5.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-jest": "^21.22.0",
+    "eslint-plugin-prettier": "^2.6.2",
+    "jest": "^23.6.0",
+    "prettier": "^1.14.2"
   },
   "dependencies": {
     "deepmerge": "^2.1.1",
     "electron": "^2.0.8",
-    "electron-store": "^2.0.0"
+    "electron-store": "^2.0.0",
+    "vue": "^2.5.17",
+    "vuex": "^3.0.1"
   }
 }

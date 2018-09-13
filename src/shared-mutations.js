@@ -31,9 +31,9 @@ function onNotifyRenderers(ipc, handler) {
   ipc.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
 }
 
-function rendererProcessLogic(store) {
+function rendererProcessLogic(store, options) {
   // Connect renderer to main process
-  connect(ipcRenderer)
+  connect(options.ipcRenderer)
 
   // Save original Vuex methods
   store.originalCommit = store.commit
@@ -41,25 +41,25 @@ function rendererProcessLogic(store) {
 
   // Don't use commit in renderer outside of actions
   store.commit = () => {
-    console.error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
+    throw new Error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
   }
 
   // Forward dispatch to main process
   store.dispatch = (type, payload) => {
-    notifyMain(ipcRenderer, { type, payload })
+    notifyMain(options.ipcRenderer, { type, payload })
   }
 
   // Subscribe on changes from main process and apply them
-  onNotifyRenderers(ipcRenderer, (event, { type, payload }) => {
+  onNotifyRenderers(options.ipcRenderer, (event, { type, payload }) => {
     store.originalCommit(type, payload)
   })
 }
 
-function mainProcessLogic(store) {
+function mainProcessLogic(store, options) {
   const connections = {}
 
   // Save new connection
-  onConnect(ipcMain, (event) => {
+  onConnect(options.ipcMain, (event) => {
     const win = event.sender
 
     connections[win.id] = win
@@ -71,7 +71,7 @@ function mainProcessLogic(store) {
   })
 
   // Subscribe on changes from renderer processes
-  onNotifyMain(ipcMain, (event, { type, payload }) => {
+  onNotifyMain(options.ipcMain, (event, { type, payload }) => {
     store.dispatch(type, payload)
   })
 
@@ -80,16 +80,19 @@ function mainProcessLogic(store) {
     const { type, payload } = mutation
 
     // Forward changes to renderer processes
-    notifyRenderers(ipcMain, { type, payload }, connections)
+    notifyRenderers(options.ipcMain, { type, payload }, connections)
   })
 }
 
-export default () => (store) => {
+export default (options = {}) => (store) => {
   const isRenderer = process.type === "renderer"
 
+  if (!options.ipcMain) options.ipcMain = ipcMain
+  if (!options.ipcRenderer) options.ipcRenderer = ipcRenderer
+
   if (isRenderer) {
-    rendererProcessLogic(store)
+    rendererProcessLogic(store, options)
   } else {
-    mainProcessLogic(store)
+    mainProcessLogic(store, options)
   }
 }

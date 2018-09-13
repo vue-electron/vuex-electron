@@ -41,7 +41,7 @@ function checkStorage(storage) {
     storage.get(STORAGE_TEST_KEY)
     storage.delete(STORAGE_TEST_KEY)
   } catch (error) {
-    new Error("[Vuex Electron] Storage is not valid. Please, read the docs.")
+    throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs.")
   }
 }
 
@@ -57,26 +57,20 @@ function loadInitialState(store, storage, key) {
 function subscribeOnChanges(store, storage, key, blacklist, whitelist) {
   store.subscribe((mutation, state) => {
     if (blacklist && blacklist(mutation)) {
-      console.log("Mutation in the blacklist:", mutation.type)
-
       return
     }
 
     if (whitelist && !whitelist(mutation)) {
-      console.log("Mutation not in the whitelist:", mutation.type)
-
       return
     }
 
     setState(storage, key, state)
-
-    // console.log("Item was added:", mutation.type)
   })
 }
 
 export default (options = {}) => (store) => {
-  const storage   = options.storage    || createStorage(options)
-  const key       = options.storageKey || STORAGE_KEY
+  const storage = options.storage || createStorage(options)
+  const key = options.storageKey || STORAGE_KEY
 
   const whitelist = loadFilter(options.whitelist, filterInArray, "whitelist")
   const blacklist = loadFilter(options.blacklist, filterInArray, "blacklist")
