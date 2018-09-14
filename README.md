@@ -9,8 +9,8 @@ The easiest way to use your Vuex store between all processes (including main).
 
 ### Features
 
-- [x] Persisted state
-- [x] Shared mutations
+:star: Persisted state  
+:star: Shared mutations
 
 ### Requirements
 
@@ -24,35 +24,35 @@ Installation of the Vuex Electron easy as 1-2-3.
 
 1. Install package with using of [yarn](https://github.com/yarnpkg/yarn) or [npm](https://github.com/npm/cli):
 
-```
-yarn install vuex-electron
-```
+    ```
+    yarn install vuex-electron
+    ```
 
-or
+    or
 
-```
-npm install vuex-electron
-```
+    ```
+    npm install vuex-electron
+    ```
 
 2. Include plugins in your Vuex store::
 
-```javascript
-import Vue from "vue"
-import Vuex from "vuex"
+    ```javascript
+    import Vue from "vue"
+    import Vuex from "vuex"
 
-import { createPersistedState, createSharedMutations } from "vuex-electron"
+    import { createPersistedState, createSharedMutations } from "vuex-electron"
 
-Vue.use(Vuex)
+    Vue.use(Vuex)
 
-export default new Vuex.Store({
-  // ...
-  plugins: [
-    createPersistedState(),
-    createSharedMutations()
-  ],
-  // ...
-})
-```
+    export default new Vuex.Store({
+      // ...
+      plugins: [
+        createPersistedState(),
+        createSharedMutations()
+      ],
+      // ...
+    })
+    ```
 
 #### IMPORTANT
 
@@ -65,19 +65,19 @@ Available options for `createPersistedState()`
 ```javascript
 createPersistedState({
   whitelist: ["whitelistedAction", "anotherWhitelistedAction"],
-  
+
   // or
-  
+
   whitelist: (mutation) => {
     return true
   },
-  
+
   // or
-  
+
   blacklist: ["ignoredAction", "anotherIgnoredAction"],
-  
+
   // or
-  
+
   blacklist: (mutation) => {
     return true
   }
