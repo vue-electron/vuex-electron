@@ -20,7 +20,10 @@
     "watch": "babel src -d dist --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "lint && jest && bundlesize"
+    "test": "yarn lint && jest && bundlesize"
+  },
+  "jest": {
+    "collectCoverage": true
   },
   "bundlesize": [
     {
