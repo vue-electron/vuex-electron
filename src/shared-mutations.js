@@ -1,67 +1,72 @@
 import { ipcMain, ipcRenderer } from "electron"
 
-function SharedMutations(options, store) {
-  const IPC_EVENT_CONNECT = "vuex-mutations-connect"
-  const IPC_EVENT_NOTIFY_MAIN = "vuex-mutations-notify-main"
-  const IPC_EVENT_NOTIFY_RENDERERS = "vuex-mutations-notify-renderers"
+const IPC_EVENT_CONNECT = "vuex-mutations-connect"
+const IPC_EVENT_NOTIFY_MAIN = "vuex-mutations-notify-main"
+const IPC_EVENT_NOTIFY_RENDERERS = "vuex-mutations-notify-renderers"
 
-  this.loadOptions = () => {
-    if (!options.type) options.type = process.type === "renderer" ? "renderer" : "main"
-    if (!options.ipcMain) options.ipcMain = ipcMain
-    if (!options.ipcRenderer) options.ipcRenderer = ipcRenderer
+class SharedMutations {
+  constructor(options, store) {
+    this.options = options
+    this.store = store
   }
 
-  this.connect = (payload) => {
-    options.ipcRenderer.send(IPC_EVENT_CONNECT, payload)
+  loadOptions() {
+    if (!this.options.type) this.options.type = process.type === "renderer" ? "renderer" : "main"
+    if (!this.options.ipcMain) this.options.ipcMain = ipcMain
+    if (!this.options.ipcRenderer) this.options.ipcRenderer = ipcRenderer
   }
 
-  this.onConnect = (handler) => {
-    options.ipcMain.on(IPC_EVENT_CONNECT, handler)
+  connect(payload) {
+    this.options.ipcRenderer.send(IPC_EVENT_CONNECT, payload)
   }
 
-  this.notifyMain = (payload) => {
-    options.ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
+  onConnect(handler) {
+    this.options.ipcMain.on(IPC_EVENT_CONNECT, handler)
   }
 
-  this.onNotifyMain = (handler) => {
-    options.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
+  notifyMain(payload) {
+    this.options.ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
   }
 
-  this.notifyRenderers = (connections, payload) => {
+  onNotifyMain(handler) {
+    this.options.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
+  }
+
+  notifyRenderers(connections, payload) {
     Object.keys(connections).forEach((processId) => {
       connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
     })
   }
 
-  this.onNotifyRenderers = (handler) => {
-    options.ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
+  onNotifyRenderers(handler) {
+    this.options.ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
   }
 
-  this.rendererProcessLogic = () => {
+  rendererProcessLogic() {
     // Connect renderer to main process
     this.connect()
 
     // Save original Vuex methods
-    store.originalCommit = store.commit
-    store.originalDispatch = store.dispatch
+    this.store.originalCommit = this.store.commit
+    this.store.originalDispatch = this.store.dispatch
 
     // Don't use commit in renderer outside of actions
-    store.commit = () => {
+    this.store.commit = () => {
       throw new Error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
     }
 
     // Forward dispatch to main process
-    store.dispatch = (type, payload) => {
+    this.store.dispatch = (type, payload) => {
       this.notifyMain({ type, payload })
     }
 
     // Subscribe on changes from main process and apply them
     this.onNotifyRenderers((event, { type, payload }) => {
-      store.originalCommit(type, payload)
+      this.store.originalCommit(type, payload)
     })
   }
 
-  this.mainProcessLogic = () => {
+  mainProcessLogic() {
     const connections = {}
 
     // Save new connection
@@ -76,11 +81,11 @@ function SharedMutations(options, store) {
 
     // Subscribe on changes from renderer processes
     this.onNotifyMain((event, { type, payload }) => {
-      store.dispatch(type, payload)
+      this.store.dispatch(type, payload)
     })
 
     // Subscribe on changes from Vuex store
-    store.subscribe((mutation) => {
+    this.store.subscribe((mutation) => {
       const { type, payload } = mutation
 
       // Forward changes to renderer processes
@@ -88,8 +93,8 @@ function SharedMutations(options, store) {
     })
   }
 
-  this.activatePlugin = () => {
-    switch (options.type) {
+  activatePlugin() {
+    switch (this.options.type) {
       case "renderer":
         this.rendererProcessLogic()
         break
