@@ -8,9 +8,9 @@
     "electron"
   ],
   "main": "./dist/index.js",
-  "repository": "https://github.com/vuex-electron/vuex-electron",
-  "homepage": "https://github.com/vuex-electron/vuex-electron",
-  "bugs": "https://github.com/vuex-electron/vuex-electron/issues",
+  "repository": "https://github.com/vue-electron/vuex-electron",
+  "homepage": "https://github.com/vue-electron/vuex-electron",
+  "bugs": "https://github.com/vue-electron/vuex-electron/issues",
   "author": "Andrew Emelianenko <emelianenko.web@gmail.com>",
   "license": "MIT",
   "private": false,
@@ -23,12 +23,15 @@
     "test": "yarn lint && jest && bundlesize"
   },
   "jest": {
-    "collectCoverage": true
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
   },
   "bundlesize": [
     {
       "path": "./dist/**/*.js",
-      "maxSize": "1 kB"
+      "maxSize": "2 kB"
     }
   ],
   "devDependencies": {
