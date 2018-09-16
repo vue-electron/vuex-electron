@@ -71,11 +71,14 @@ class SharedMutations {
 
     // Save new connection
     this.onConnect((event) => {
-      connections[event.sender.id] = event.sender
+      const win = event.sender
+      const winId = win.id
+
+      connections[winId] = win
 
       // Remove connection when window is closed
-      event.sender.on("destroyed", () => {
-        delete connections[event.sender.id]
+      win.on("destroyed", () => {
+        delete connections[winId]
       })
     })
 
