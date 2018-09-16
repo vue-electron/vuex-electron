@@ -1,81 +1,83 @@
 import merge from "deepmerge"
 import Store from "electron-store"
 
-const STORAGE_NAME = "vuex"
-const STORAGE_KEY = "state"
-const STORAGE_TEST_KEY = "test"
+function PersistedState(options, store) {
+  const STORAGE_NAME = "vuex"
+  const STORAGE_KEY = "state"
+  const STORAGE_TEST_KEY = "test"
 
-function createStorage(options) {
-  return new Store({ name: options.storageName || STORAGE_NAME })
-}
+  this.loadOptions = () => {
+    if (!options.storage) options.storage = this.createStorage()
+    if (!options.storageKey) options.storageKey = STORAGE_KEY
 
-function getState(storage, key) {
-  return storage.get(key)
-}
-
-function setState(storage, key, value) {
-  storage.set(key, value)
-}
-
-function loadFilter(filter, arrayFilter, name) {
-  if (!filter) {
-    return null
-  } else if (filter instanceof Array) {
-    return arrayFilter(filter)
-  } else if (typeof filter === "function") {
-    return filter
-  } else {
-    new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
+    this.whitelist = this.loadFilter(options.whitelist, "whitelist")
+    this.blacklist = this.loadFilter(options.blacklist, "blacklist")
   }
-}
 
-function filterInArray(list) {
-  return (mutation) => {
-    return list.includes(mutation.type)
+  this.createStorage = () => {
+    return new Store({ name: options.storageName || STORAGE_NAME })
   }
-}
 
-function checkStorage(storage) {
-  try {
-    storage.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
-    storage.get(STORAGE_TEST_KEY)
-    storage.delete(STORAGE_TEST_KEY)
-  } catch (error) {
-    throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs.")
+  this.getState = () => {
+    return options.storage.get(options.storageKey)
   }
-}
 
-function loadInitialState(store, storage, key) {
-  const state = getState(storage, key)
-
-  if (state) {
-    const mergedState = merge(store.state, state)
-    store.replaceState(mergedState)
+  this.setState = (state) => {
+    options.storage.set(options.storageKey, state)
   }
-}
 
-function subscribeOnChanges(store, storage, key, blacklist, whitelist) {
-  store.subscribe((mutation, state) => {
-    if (blacklist && blacklist(mutation)) {
-      return
+  this.loadFilter = (filter, name) => {
+    if (!filter) {
+      return null
+    } else if (filter instanceof Array) {
+      return this.filterInArray(filter)
+    } else if (typeof filter === "function") {
+      return filter
+    } else {
+      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
     }
+  }
 
-    if (whitelist && !whitelist(mutation)) {
-      return
+  this.filterInArray = (list) => {
+    return (mutation) => {
+      return list.includes(mutation.type)
     }
+  }
 
-    setState(storage, key, state)
-  })
+  this.checkStorage = () => {
+    try {
+      options.storage.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
+      options.storage.get(STORAGE_TEST_KEY)
+      options.storage.delete(STORAGE_TEST_KEY)
+    } catch (error) {
+      throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs.")
+    }
+  }
+
+  this.loadInitialState = () => {
+    const state = this.getState(options.storage, options.storageKey)
+
+    if (state) {
+      const mergedState = merge(store.state, state)
+      store.replaceState(mergedState)
+    }
+  }
+
+  this.subscribeOnChanges = () => {
+    store.subscribe((mutation, state) => {
+      if (this.blacklist && this.blacklist(mutation)) return
+      if (this.whitelist && !this.whitelist(mutation)) return
+
+      this.setState(state)
+    })
+  }
 }
 
 export default (options = {}) => (store) => {
-  const storage = options.storage || createStorage(options)
-  const key = options.storageKey || STORAGE_KEY
+  const persistedState = new PersistedState(options, store)
 
-  const whitelist = loadFilter(options.whitelist, filterInArray, "whitelist")
-  const blacklist = loadFilter(options.blacklist, filterInArray, "blacklist")
-
-  checkStorage(storage)
-  loadInitialState(store, storage, key)
-  subscribeOnChanges(store, storage, key, blacklist, whitelist)
+  persistedState.loadOptions()
+  persistedState.checkStorage()
+  persistedState.loadInitialState()
+  persistedState.subscribeOnChanges()
 }

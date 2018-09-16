@@ -1,98 +1,110 @@
 import { ipcMain, ipcRenderer } from "electron"
 
-const IPC_EVENT_CONNECT = "vuex-mutations-connect"
-const IPC_EVENT_NOTIFY_MAIN = "vuex-mutations-notify-main"
-const IPC_EVENT_NOTIFY_RENDERERS = "vuex-mutations-notify-renderers"
+function SharedMutations(options, store) {
+  const IPC_EVENT_CONNECT = "vuex-mutations-connect"
+  const IPC_EVENT_NOTIFY_MAIN = "vuex-mutations-notify-main"
+  const IPC_EVENT_NOTIFY_RENDERERS = "vuex-mutations-notify-renderers"
 
-// IPC Configuration
-function connect(ipc, payload) {
-  ipc.send(IPC_EVENT_CONNECT, payload)
-}
-
-function onConnect(ipc, handler) {
-  ipc.on(IPC_EVENT_CONNECT, handler)
-}
-
-function notifyMain(ipc, payload) {
-  ipc.send(IPC_EVENT_NOTIFY_MAIN, payload)
-}
-
-function onNotifyMain(ipc, handler) {
-  ipc.on(IPC_EVENT_NOTIFY_MAIN, handler)
-}
-
-function notifyRenderers(ipc, payload, connections) {
-  Object.keys(connections).forEach((processId) => {
-    connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
-  })
-}
-
-function onNotifyRenderers(ipc, handler) {
-  ipc.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
-}
-
-function rendererProcessLogic(store, options) {
-  // Connect renderer to main process
-  connect(options.ipcRenderer)
-
-  // Save original Vuex methods
-  store.originalCommit = store.commit
-  store.originalDispatch = store.dispatch
-
-  // Don't use commit in renderer outside of actions
-  store.commit = () => {
-    throw new Error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
+  this.loadOptions = () => {
+    if (!options.type) options.type = process.type === "renderer" ? "renderer" : "main"
+    if (!options.ipcMain) options.ipcMain = ipcMain
+    if (!options.ipcRenderer) options.ipcRenderer = ipcRenderer
   }
 
-  // Forward dispatch to main process
-  store.dispatch = (type, payload) => {
-    notifyMain(options.ipcRenderer, { type, payload })
+  this.connect = (payload) => {
+    options.ipcRenderer.send(IPC_EVENT_CONNECT, payload)
   }
 
-  // Subscribe on changes from main process and apply them
-  onNotifyRenderers(options.ipcRenderer, (event, { type, payload }) => {
-    store.originalCommit(type, payload)
-  })
-}
+  this.onConnect = (handler) => {
+    options.ipcMain.on(IPC_EVENT_CONNECT, handler)
+  }
 
-function mainProcessLogic(store, options) {
-  const connections = {}
+  this.notifyMain = (payload) => {
+    options.ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
+  }
 
-  // Save new connection
-  onConnect(options.ipcMain, (event) => {
-    const win = event.sender
+  this.onNotifyMain = (handler) => {
+    options.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
+  }
 
-    connections[win.id] = win
-
-    // Remove connection when window is closed
-    win.on("destroyed", () => {
-      delete connections[win.id]
+  this.notifyRenderers = (connections, payload) => {
+    Object.keys(connections).forEach((processId) => {
+      connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
     })
-  })
+  }
 
-  // Subscribe on changes from renderer processes
-  onNotifyMain(options.ipcMain, (event, { type, payload }) => {
-    store.dispatch(type, payload)
-  })
+  this.onNotifyRenderers = (handler) => {
+    options.ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
+  }
 
-  // Subscribe on changes from Vuex store
-  store.subscribe((mutation) => {
-    const { type, payload } = mutation
+  this.rendererProcessLogic = () => {
+    // Connect renderer to main process
+    this.connect()
 
-    // Forward changes to renderer processes
-    notifyRenderers(options.ipcMain, { type, payload }, connections)
-  })
+    // Save original Vuex methods
+    store.originalCommit = store.commit
+    store.originalDispatch = store.dispatch
+
+    // Don't use commit in renderer outside of actions
+    store.commit = () => {
+      throw new Error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
+    }
+
+    // Forward dispatch to main process
+    store.dispatch = (type, payload) => {
+      this.notifyMain({ type, payload })
+    }
+
+    // Subscribe on changes from main process and apply them
+    this.onNotifyRenderers((event, { type, payload }) => {
+      store.originalCommit(type, payload)
+    })
+  }
+
+  this.mainProcessLogic = () => {
+    const connections = {}
+
+    // Save new connection
+    this.onConnect((event) => {
+      connections[event.sender.id] = event.sender
+
+      // Remove connection when window is closed
+      event.sender.on("destroyed", () => {
+        delete connections[event.sender.id]
+      })
+    })
+
+    // Subscribe on changes from renderer processes
+    this.onNotifyMain((event, { type, payload }) => {
+      store.dispatch(type, payload)
+    })
+
+    // Subscribe on changes from Vuex store
+    store.subscribe((mutation) => {
+      const { type, payload } = mutation
+
+      // Forward changes to renderer processes
+      this.notifyRenderers(connections, { type, payload })
+    })
+  }
+
+  this.activatePlugin = () => {
+    switch (options.type) {
+      case "renderer":
+        this.rendererProcessLogic()
+        break
+      case "main":
+        this.mainProcessLogic()
+        break
+      default:
+        throw new Error(`[Vuex Electron] Type should be "renderer" or "main".`)
+    }
+  }
 }
 
 export default (options = {}) => (store) => {
-  const isRenderer = process.type === "renderer"
+  const sharedMutations = new SharedMutations(options, store)
 
-  if (!options.ipcMain) options.ipcMain = ipcMain
-  if (!options.ipcRenderer) options.ipcRenderer = ipcRenderer
-
-  if (isRenderer) {
-    rendererProcessLogic(store, options)
-  } else {
-    mainProcessLogic(store, options)
-  }
+  sharedMutations.loadOptions()
+  sharedMutations.activatePlugin()
 }
