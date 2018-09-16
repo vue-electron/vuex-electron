@@ -7,7 +7,8 @@
 [![Travis](https://img.shields.io/travis/com/vue-electron/vuex-electron.svg?style=flat-square)](https://travis-ci.com/vue-electron/vuex-electron)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/vue-electron/vuex-electron.svg?style=flat-square)](https://codeclimate.com/github/vue-electron/vuex-electron)
 [![Code Climate](https://img.shields.io/codeclimate/coverage/vue-electron/vuex-electron.svg?style=flat-square)](https://codeclimate.com/github/vue-electron/vuex-electron)
-[![Made With Love](https://img.shields.io/badge/made%20with-love-green.svg?style=flat-square)](https://github.com/MrEmelianenko)
+[![Code Style Prettier](https://img.shields.io/badge/code%20style-prettier-brightgreen.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Made With Love](https://img.shields.io/badge/made%20with-love-brightgreen.svg?style=flat-square)](https://github.com/MrEmelianenko)
 
 The easiest way to use your Vuex store between all processes (including main).
 

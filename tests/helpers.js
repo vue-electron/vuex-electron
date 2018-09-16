@@ -1,8 +1,7 @@
 import Vue from "vue"
 import Vuex from "vuex"
 
-import createPersistedState from "../src/persisted-state"
-import createSharedMutations from "../src/shared-mutations"
+import { createPersistedState, createSharedMutations } from "../src"
 
 Vue.use(Vuex)
 
