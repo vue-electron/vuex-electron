@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="750" height="200" src="https://user-images.githubusercontent.com/678665/45566726-404d9e80-b860-11e8-94b6-527dfcc3b3b3.png">
+  <img width="750" src="https://user-images.githubusercontent.com/678665/45566726-404d9e80-b860-11e8-94b6-527dfcc3b3b3.png">
 </p>
 
 # Vuex Electron
