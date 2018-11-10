@@ -10,7 +10,7 @@
 [![Code Style Prettier](https://img.shields.io/badge/code%20style-prettier-brightgreen.svg?style=for-the-badge&longCache=true)](https://github.com/prettier/prettier)
 [![Made With Love](https://img.shields.io/badge/made%20with-love-brightgreen.svg?style=for-the-badge&longCache=true)](https://github.com/MrEmelianenko)
 
-The easiest way to use your Vuex store between all processes (including main).
+The easiest way to share your Vuex Store between all processes (including main).
 
 ### Features
 
