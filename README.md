@@ -59,11 +59,19 @@ Installation of the Vuex Electron easy as 1-2-3.
     })
     ```
 
-  3. Well done you did it! The last step is to add the star to this repo :smile:
+3. In case if you enabled `createSharedMutations()` plugin you need to create an instance of store in the main process. To do it just add this line into your main process (for example `src/main.js`):
 
-#### IMPORTANT
+    ```javascript
+    import './path/to/your/store'
+    ```
 
-> For proper work of the package, you shouldn't use `store.commit` outside of actions.
+4. Well done you did it! The last step is to add the star to this repo :smile:
+
+**Usage example: [Vuex Electron Example](https://github.com/vue-electron/vuex-electron-example)**
+
+## IMPORTANT
+
+In renderer process to call actions you need to use `dispatch` or `mapActions`. Don't use `commit` because actions fired via `commit` will not be shared between processes.
 
 ### Options
 
@@ -96,5 +104,14 @@ createPersistedState({
 - [x] Configure ESLint and Prettier
 - [x] Configure Travis CI and CodeClimate
 - [x] Minify package
-- [ ] Write tests
-- [ ] Write docs
+- [x] Write tests
+- [x] Write docs
+
+### Author
+
+Andrew Emelianenko  
+[@emelianenkooo](https://www.instagram.com/emelianenkooo/)
+
+### License
+
+[MIT License](https://github.com/vue-electron/vuex-electron/blob/master/LICENSE)
