@@ -51,9 +51,11 @@
     "jest": "^23.6.0",
     "prettier": "^1.14.2"
   },
+  "peerDependencies": {
+    "electron": "^2.0.8"
+  },
   "dependencies": {
     "deepmerge": "^2.1.1",
-    "electron": "^2.0.8",
     "electron-store": "^2.0.0",
     "vue": "^2.5.17",
     "vuex": "^3.0.1"
