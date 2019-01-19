@@ -1,8 +1,8 @@
 # Changelog
 
-### In Progress
+### 1.0.3
 
-- Move `electron` to `peerDependencies` 
+- Move `electron`, `vue`, and `vuex` to `devDependencies` 
 
 ### 1.0.2
 
