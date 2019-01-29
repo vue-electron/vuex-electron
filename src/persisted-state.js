@@ -1,6 +1,7 @@
 import merge from "deepmerge"
 import Store from "electron-store"
-
+import electron from "electron"
+import _ from "lodash"
 const STORAGE_NAME = "vuex"
 const STORAGE_KEY = "state"
 const STORAGE_TEST_KEY = "test"
@@ -27,9 +28,9 @@ class PersistedState {
     return this.options.storage.get(this.options.storageKey)
   }
 
-  setState(state) {
+  setState = _.debounce((state) => {
     this.options.storage.set(this.options.storageKey, state)
-  }
+  }, 1000)
 
   loadFilter(filter, name) {
     if (!filter) {
@@ -104,5 +105,5 @@ export default (options = {}) => (store) => {
   persistedState.loadOptions()
   persistedState.checkStorage()
   persistedState.loadInitialState()
-  persistedState.subscribeOnChanges()
+  !electron.remote && persistedState.subscribeOnChanges()
 }

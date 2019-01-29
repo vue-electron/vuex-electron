@@ -37,6 +37,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/preset-env": "^7.0.0",
     "babel-core": "^7.0.0-0",
     "babel-eslint": "^9.0.0",
@@ -56,6 +57,7 @@
   },
   "dependencies": {
     "deepmerge": "^2.1.1",
-    "electron-store": "^2.0.0"
+    "electron-store": "^2.0.0",
+    "lodash": "^4.17.11"
   }
 }
