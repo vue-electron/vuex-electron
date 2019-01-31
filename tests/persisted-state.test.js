@@ -149,4 +149,23 @@ describe("createPersistedState", () => {
     expect(store.state.count).toEqual(0)
     expect(storage.get("state").count).toEqual(0)
   })
+
+  it("filters using ignoredPaths", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        ignoredPaths: ["count"],
+        storage
+      }
+    })
+
+    store.dispatch("increment")
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state").count).toBeUndefined()
+
+    store.dispatch("decrement")
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toBeUndefined()
+  })
 })

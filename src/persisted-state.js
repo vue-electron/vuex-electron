@@ -53,27 +53,29 @@ class PersistedState {
   // Removes ignored paths from the store object before persisting it
   removeIgnoredPaths(state) {
     try {
-      // Creates a copy of the store object, 
+      // Creates a copy of the store object
       var stateCopy = JSON.parse(JSON.stringify(state))
       for (let i = 0; i < this.options.ignoredPaths.length; i++) {
         const path = this.options.ignoredPaths[i]
-        this.setToValue(stateCopy, undefined, path)
+        this.deleteValue(stateCopy, path)
       }
       return stateCopy
     } catch (error) {
-      throw new Error("[Vuex Electron] An error occurred while removing ignored paths from state. Please use a string array of property paths.")
+      throw new Error(
+        "[Vuex Electron] An error occurred while removing ignored paths from state. Please use a string array of property paths."
+      )
     }
   }
 
   // Sets a property on an object to a supplied value, based on a given property path
-  setToValue(obj, value, path) {
+  deleteValue(obj, path) {
     var i
-    path = path.split('.')
+    path = path.split(".")
     for (i = 0; i < path.length - 1; i++) {
       obj = obj[path[i]]
     }
 
-    obj[path[i]] = value
+    delete obj[path[i]]
   }
 
   checkStorage() {
