@@ -41,7 +41,7 @@ describe("createPersistedState", () => {
     const storage = createStorage()
     const randomNumber = Math.floor(Math.random() * (10 - 3 + 1) + 3)
 
-    storage.set("state", { count: randomNumber })
+    storage.set("state", { count: randomNumber, array: [1, 2, 3] })
 
     const store = createStore({ persistedState: { storage } })
 

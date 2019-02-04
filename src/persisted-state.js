@@ -63,6 +63,7 @@ class PersistedState {
     const emptyTarget = (value) => (Array.isArray(value) ? [] : {})
     const clone = (value, options) => merge(emptyTarget(value), value, options)
     const destination = target.slice()
+
     source.forEach(function(e, i) {
       if (typeof destination[i] === "undefined") {
         const cloneRequested = options.clone !== false
@@ -74,6 +75,7 @@ class PersistedState {
         destination.push(e)
       }
     })
+
     return destination
   }
 

@@ -99,18 +99,10 @@ createPersistedState({
 })
 ```
 
-## Development Roadmap
-
-- [x] Configure ESLint and Prettier
-- [x] Configure Travis CI and CodeClimate
-- [x] Minify package
-- [x] Write tests
-- [x] Write docs
-
 ### Author
 
 Andrew Emelianenko  
-[@emelianenkooo](https://www.instagram.com/emelianenkooo/)
+IG: [@truemelianenko](https://www.instagram.com/truemelianenko)
 
 ### License
 
