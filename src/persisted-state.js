@@ -16,8 +16,7 @@ class PersistedState {
     if (!this.options.storage) this.options.storage = this.createStorage()
     if (!this.options.storageKey) this.options.storageKey = STORAGE_KEY
 
-    this.whitelist = this.loadFilter(this.options.whitelist, "whitelist")
-    this.blacklist = this.loadFilter(this.options.blacklist, "blacklist")
+    this.ignoredCommits = this.loadFilter(this.options.ignoredCommits, "ignoredCommits", this.options.invertIgnored)
   }
 
   createStorage() {
@@ -32,12 +31,17 @@ class PersistedState {
     this.options.storage.set(this.options.storageKey, state)
   }
 
-  loadFilter(filter, name) {
+  loadFilter(filter, name, invertIgnored) {
     if (!filter) {
       return null
     } else if (filter instanceof Array) {
       return this.filterInArray(filter)
     } else if (typeof filter === "function") {
+      if (invertIgnored) {
+        return (mutation) => {
+          return !filter(mutation)
+        }
+      }
       return filter
     } else {
       throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
@@ -46,6 +50,9 @@ class PersistedState {
 
   filterInArray(list) {
     return (mutation) => {
+      if (this.options.invertIgnored) {
+        return !list.includes(mutation.type)
+      }
       return list.includes(mutation.type)
     }
   }
@@ -53,6 +60,15 @@ class PersistedState {
   // Removes ignored paths from the store object before persisting it
   removeIgnoredPaths(state) {
     try {
+      if (this.options.invertIgnored) {
+        var newState = {}
+        for (let i = 0; i < this.options.ignoredPaths.length; i++) {
+          const path = this.options.ignoredPaths[i]
+          this.setToValue(newState, this.deepFind(state, path), path)
+        }
+        return newState
+      }
+
       // Creates a copy of the store object
       var stateCopy = JSON.parse(JSON.stringify(state))
       for (let i = 0; i < this.options.ignoredPaths.length; i++) {
@@ -67,7 +83,7 @@ class PersistedState {
     }
   }
 
-  // Sets a property on an object to a supplied value, based on a given property path
+  // Deletes, based on a given property path
   deleteValue(obj, path) {
     var i
     path = path.split(".")
@@ -76,6 +92,32 @@ class PersistedState {
     }
 
     delete obj[path[i]]
+  }
+
+  // Curtesy of qiao on Stack Overflow.
+  deepFind(obj, path) {
+    var paths = path.split("."),
+      current = obj,
+      i
+
+    for (i = 0; i < paths.length; ++i) {
+      if (current[paths[i]] == undefined) {
+        return undefined
+      } else {
+        current = current[paths[i]]
+      }
+    }
+    return current
+  }
+
+  setToValue(obj, value, path) {
+    var i
+    path = path.split(".")
+    for (i = 0; i < path.length - 1; i++) {
+      obj = obj[path[i]]
+    }
+
+    obj[path[i]] = value
   }
 
   checkStorage() {
@@ -119,8 +161,7 @@ class PersistedState {
 
   subscribeOnChanges() {
     this.store.subscribe((mutation, state) => {
-      if (this.blacklist && this.blacklist(mutation)) return
-      if (this.whitelist && !this.whitelist(mutation)) return
+      if (this.ignoredCommits && this.ignoredCommits(mutation)) return
       if (this.options.ignoredPaths) {
         this.persistedStoreCopy = this.removeIgnoredPaths(state)
         this.setState(this.persistedStoreCopy)

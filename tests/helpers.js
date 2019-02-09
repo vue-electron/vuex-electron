@@ -23,7 +23,8 @@ function createStore(options = {}) {
 
   return new Vuex.Store({
     state: {
-      count: 0
+      count: 0,
+      count2: 0
     },
     actions: {
       increment({ commit }) {
@@ -32,6 +33,14 @@ function createStore(options = {}) {
 
       decrement({ commit }) {
         commit("decrement")
+      },
+
+      increment2({ commit }) {
+        commit("increment2")
+      },
+
+      decrement2({ commit }) {
+        commit("decrement2")
       }
     },
     mutations: {
@@ -41,6 +50,14 @@ function createStore(options = {}) {
 
       decrement(state) {
         state.count--
+      },
+
+      increment2(state) {
+        state.count2++
+      },
+
+      decrement2(state) {
+        state.count2--
       }
     },
     plugins
