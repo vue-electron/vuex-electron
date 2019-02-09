@@ -48,76 +48,25 @@ describe("createPersistedState", () => {
     expect(store.state.count).toEqual(randomNumber)
   })
 
-  it("filters whitelist (wrong type)", () => {
+  it("filters ignoredCommits (wrong type)", () => {
     const storage = createStorage()
 
     expect(() => {
       createStore({
         persistedState: {
-          whitelist: {},
+          ignoredCommits: {},
           storage
         }
       })
     }).toThrow()
   })
 
-  it("filters whitelist (array)", () => {
+  it("filters ignoredCommits (array)", () => {
     const storage = createStorage()
 
     const store = createStore({
       persistedState: {
-        whitelist: ["increment"],
-        storage
-      }
-    })
-
-    store.dispatch("increment")
-    expect(store.state.count).toEqual(1)
-    expect(storage.get("state").count).toEqual(1)
-
-    store.dispatch("decrement")
-    expect(store.state.count).toEqual(0)
-    expect(storage.get("state").count).toEqual(1)
-  })
-
-  it("filters whitelist (function)", () => {
-    const storage = createStorage()
-
-    const store = createStore({
-      persistedState: {
-        whitelist: (mutation) => ["increment"].includes(mutation.type),
-        storage
-      }
-    })
-
-    store.dispatch("increment")
-    expect(store.state.count).toEqual(1)
-    expect(storage.get("state").count).toEqual(1)
-
-    store.dispatch("decrement")
-    expect(store.state.count).toEqual(0)
-    expect(storage.get("state").count).toEqual(1)
-  })
-
-  it("filters blacklist (wrong type)", () => {
-    const storage = createStorage()
-
-    expect(() => {
-      createStore({
-        persistedState: {
-          blacklist: {},
-          storage
-        }
-      })
-    }).toThrow()
-  })
-
-  it("filters blacklist (array)", () => {
-    const storage = createStorage()
-
-    const store = createStore({
-      persistedState: {
-        blacklist: ["increment"],
+        ignoredCommits: ["increment"],
         storage
       }
     })
@@ -131,12 +80,12 @@ describe("createPersistedState", () => {
     expect(storage.get("state").count).toEqual(0)
   })
 
-  it("filters blacklist (function)", () => {
+  it("filters ignoredCommits (function)", () => {
     const storage = createStorage()
 
     const store = createStore({
       persistedState: {
-        blacklist: (mutation) => ["increment"].includes(mutation.type),
+        ignoredCommits: (mutation) => ["increment"].includes(mutation.type),
         storage
       }
     })
@@ -160,12 +109,72 @@ describe("createPersistedState", () => {
       }
     })
 
-    store.dispatch("increment")
+    store.dispatch("increment") // Modifications will NOT be allowed to be persisted.
     expect(store.state.count).toEqual(1)
     expect(storage.get("state").count).toBeUndefined()
 
-    store.dispatch("decrement")
+    store.dispatch("decrement") // Modifications will NOT be allowed to be persisted.
     expect(store.state.count).toEqual(0)
     expect(storage.get("state").count).toBeUndefined()
+  })
+
+  it("filters using ignoredPaths and ignoredCommits", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        ignoredPaths: ["count"],
+        ignoredCommits: (mutation) => ["increment2"].includes(mutation.type),
+        storage
+      }
+    })
+
+    store.dispatch("increment") // Modifications will NOT be allowed to be persisted, but WILL trigger a persistance.
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state").count).toBeUndefined()
+
+    store.dispatch("decrement") // Modifications will NOT be allowed to be persisted, but WILL trigger a persistance.
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toBeUndefined()
+
+    store.dispatch("increment2") // Modifications WILL be allowed to be persisted, but wont trigger a persistance.
+    expect(store.state.count2).toEqual(1)
+    expect(storage.get("state").count2).toEqual(0)
+
+    store.dispatch("decrement2") // Modifications WILL be allowed to be persisted, AND WILL trigger a persistance.
+    expect(store.state.count2).toEqual(0)
+    expect(storage.get("state").count2).toEqual(0)
+  })
+
+  it("filters using ignoredPaths, ignoredCommits and invertIgnored", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        ignoredPaths: ["count"],
+        ignoredCommits: (mutation) => ["increment2"].includes(mutation.type),
+        invertIgnored: true,
+        storage
+      }
+    })
+
+    store.dispatch("increment") // Modifications will be allowed to be persisted, but wont trigger a persistance.
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state")).toBeUndefined()
+
+    store.dispatch("decrement") // Modifications will be allowed to be persisted, but wont trigger a persistance.
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state")).toBeUndefined()
+
+    store.dispatch("increment2") // Modifications will NOT be allowed to be persisted, but WILL trigger a persistance.
+    expect(store.state.count2).toEqual(1)
+    expect(storage.get("state").count2).toBeUndefined()
+    expect(storage.get("state").count).toEqual(0)
+
+    store.dispatch("decrement2") // Modifications will NOT be allowed to be persisted, AND will NOT trigger a persistance.
+    expect(store.state.count2).toEqual(0)
+    expect(storage.get("state").count2).toBeUndefined()
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toEqual(0)
   })
 })
