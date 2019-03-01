@@ -167,7 +167,10 @@ class PersistedState {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
 
+      // Returns if the current commit should not cause persistance.
       if (this.ignoredCommits && this.ignoredCommits(mutation)) return
+
+      // Filters the state before persisting, if ignoredPaths is set.
       if (this.options.ignoredPaths) {
         this.persistedStoreCopy = this.removeIgnoredPaths(state)
         this.setState(this.persistedStoreCopy)
