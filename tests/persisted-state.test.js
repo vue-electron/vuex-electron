@@ -48,6 +48,108 @@ describe("createPersistedState", () => {
     expect(store.state.count).toEqual(randomNumber)
   })
 
+  it("filters whitelist (wrong type)", () => {
+    const storage = createStorage()
+
+    expect(() => {
+      createStore({
+        persistedState: {
+          whitelist: {},
+          storage
+        }
+      })
+    }).toThrow()
+  })
+
+  it("filters whitelist (array)", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        whitelist: ["increment"],
+        storage
+      }
+    })
+
+    store.dispatch("increment")
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state").count).toEqual(1)
+
+    store.dispatch("decrement")
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toEqual(1)
+  })
+
+  it("filters whitelist (function)", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        whitelist: (mutation) => ["increment"].includes(mutation.type),
+        storage
+      }
+    })
+
+    store.dispatch("increment")
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state").count).toEqual(1)
+
+    store.dispatch("decrement")
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toEqual(1)
+  })
+
+  it("filters blacklist (wrong type)", () => {
+    const storage = createStorage()
+
+    expect(() => {
+      createStore({
+        persistedState: {
+          blacklist: {},
+          storage
+        }
+      })
+    }).toThrow()
+  })
+
+  it("filters blacklist (array)", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        blacklist: ["increment"],
+        storage
+      }
+    })
+
+    store.dispatch("increment")
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state")).toBeUndefined()
+
+    store.dispatch("decrement")
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toEqual(0)
+  })
+
+  it("filters blacklist (function)", () => {
+    const storage = createStorage()
+
+    const store = createStore({
+      persistedState: {
+        blacklist: (mutation) => ["increment"].includes(mutation.type),
+        storage
+      }
+    })
+
+    store.dispatch("increment")
+    expect(store.state.count).toEqual(1)
+    expect(storage.get("state")).toBeUndefined()
+
+    store.dispatch("decrement")
+    expect(store.state.count).toEqual(0)
+    expect(storage.get("state").count).toEqual(0)
+  })
+
   it("filters ignoredCommits (wrong type)", () => {
     const storage = createStorage()
 

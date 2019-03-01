@@ -16,6 +16,9 @@ class PersistedState {
     if (!this.options.storage) this.options.storage = this.createStorage()
     if (!this.options.storageKey) this.options.storageKey = STORAGE_KEY
 
+    this.whitelist = this.loadFilter(this.options.whitelist, "whitelist")
+    this.blacklist = this.loadFilter(this.options.blacklist, "blacklist")
+
     this.ignoredCommits = this.loadFilter(this.options.ignoredCommits, "ignoredCommits", this.options.invertIgnored)
   }
 
@@ -161,6 +164,9 @@ class PersistedState {
 
   subscribeOnChanges() {
     this.store.subscribe((mutation, state) => {
+      if (this.blacklist && this.blacklist(mutation)) return
+      if (this.whitelist && !this.whitelist(mutation)) return
+
       if (this.ignoredCommits && this.ignoredCommits(mutation)) return
       if (this.options.ignoredPaths) {
         this.persistedStoreCopy = this.removeIgnoredPaths(state)
