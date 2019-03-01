@@ -4,16 +4,19 @@ import Store from "electron-store"
 const STORAGE_NAME = "vuex"
 const STORAGE_KEY = "state"
 const STORAGE_TEST_KEY = "test"
+const DEBOUNCE_TIME = 0
 
 class PersistedState {
   constructor(options, store) {
     this.options = options
     this.store = store
+    this.timestamps = []
   }
 
   loadOptions() {
     if (!this.options.storage) this.options.storage = this.createStorage()
     if (!this.options.storageKey) this.options.storageKey = STORAGE_KEY
+    if (!this.options.debounceTime) this.options.debounceTime = DEBOUNCE_TIME
 
     this.whitelist = this.loadFilter(this.options.whitelist, "whitelist")
     this.blacklist = this.loadFilter(this.options.blacklist, "blacklist")
@@ -29,6 +32,17 @@ class PersistedState {
 
   setState(state) {
     this.options.storage.set(this.options.storageKey, state)
+  }
+
+  debounceSetState(state) {
+    const timestamp = new Date()
+    this.timestamps.push(timestamp)
+    setTimeout(() => {
+      if (this.timestamps[this.timestamps.length - 1] === timestamp) {
+        this.setState(state)
+      }
+      this.timestamps.shift()
+    }, this.options.debounceTime)
   }
 
   loadFilter(filter, name) {
@@ -93,7 +107,11 @@ class PersistedState {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
 
-      this.setState(state)
+      if (this.options.debounceTime) {
+        this.debounceSetState(state)
+      } else {
+        this.setState(state)
+      }
     })
   }
 }
