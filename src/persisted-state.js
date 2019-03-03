@@ -37,18 +37,19 @@ class PersistedState {
   loadFilter(filter, name, invertIgnored) {
     if (!filter) {
       return null
-    } else if (filter instanceof Array) {
+    }
+    if (filter instanceof Array) {
       return this.filterInArray(filter)
-    } else if (typeof filter === "function") {
+    }
+    if (typeof filter === "function") {
       if (invertIgnored) {
         return (mutation) => {
           return !filter(mutation)
         }
       }
       return filter
-    } else {
-      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
     }
+    throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
   }
 
   filterInArray(list) {
