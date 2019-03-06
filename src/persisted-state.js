@@ -28,7 +28,8 @@ class PersistedState {
   }
 
   setState(state) {
-    this.options.storage.set(this.options.storageKey, state)
+    if (process.env.NODE_ENV === "test" || process.type === "browser")
+      this.options.storage.set(this.options.storageKey, state)
   }
 
   loadFilter(filter, name) {
