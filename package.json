@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "deepmerge": "^2.1.1",
-    "electron-store": "^2.0.0"
+    "electron-store": "^2.0.0",
+    "fast-deep-equal": "^2.0.1"
   }
 }

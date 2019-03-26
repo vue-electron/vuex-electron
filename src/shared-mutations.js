@@ -1,4 +1,5 @@
 import { ipcMain, ipcRenderer } from "electron"
+import equal from "fast-deep-equal"
 
 const IPC_EVENT_CONNECT = "vuex-mutations-connect"
 const IPC_EVENT_NOTIFY_MAIN = "vuex-mutations-notify-main"
@@ -32,9 +33,9 @@ class SharedMutations {
     this.options.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
   }
 
-  notifyRenderers(connections, payload) {
+  notifyRenderers(connections, payload, excludeId = -1) {
     Object.keys(connections).forEach((processId) => {
-      connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
+      Number(processId) !== excludeId && connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
     })
   }
 
@@ -46,23 +47,23 @@ class SharedMutations {
     // Connect renderer to main process
     this.connect()
 
-    // Save original Vuex methods
-    this.store.originalCommit = this.store.commit
-    this.store.originalDispatch = this.store.dispatch
-
-    // Don't use commit in renderer outside of actions
-    this.store.commit = () => {
-      throw new Error(`[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.`)
-    }
-
-    // Forward dispatch to main process
-    this.store.dispatch = (type, payload) => {
-      this.notifyMain({ type, payload })
-    }
+    // Forward commit to main process
+    this.store.subscribe((mutation) => {
+      // If both mutation equal is intercept notify
+      let lastMutation = { type: this.lastType, payload: this.lastPayload }
+      if (equal(lastMutation, mutation)) {
+        this.lastType = null
+        this.lastPayload = null
+      } else {
+        this.notifyMain(mutation)
+      }
+    })
 
     // Subscribe on changes from main process and apply them
     this.onNotifyRenderers((event, { type, payload }) => {
-      this.store.originalCommit(type, payload)
+      this.lastType = type
+      this.lastPayload = payload
+      this.store.commit(type, payload)
     })
   }
 
@@ -82,17 +83,24 @@ class SharedMutations {
       })
     })
 
-    // Subscribe on changes from renderer processes
-    this.onNotifyMain((event, { type, payload }) => {
-      this.store.dispatch(type, payload)
+    this.store.subscribe((mutation) => {
+      // If both mutation equal is intercept notify
+      let lastMutation = { type: this.lastType, payload: this.lastPayload }
+      if (equal(lastMutation, mutation)) {
+        this.lastType = null
+        this.lastPayload = null
+      } else {
+        this.notifyRenderers(connections, mutation)
+      }
     })
 
-    // Subscribe on changes from Vuex store
-    this.store.subscribe((mutation) => {
-      const { type, payload } = mutation
-
+    // Subscribe on changes from renderer processes
+    this.onNotifyMain((event, { type, payload }) => {
+      this.lastType = type
+      this.lastPayload = payload
+      this.store.commit(type, payload)
       // Forward changes to renderer processes
-      this.notifyRenderers(connections, { type, payload })
+      this.notifyRenderers(connections, { type, payload }, event.sender.id)
     })
   }
 

@@ -71,7 +71,7 @@ describe("createSharedMutations", () => {
     }).not.toThrow()
   })
 
-  it("does not allow to use commit in renderer mode", () => {
+  it("allows to use commit in renderer mode", () => {
     const store = createStore({
       sharedMutations: {
         type: "renderer",
@@ -82,7 +82,7 @@ describe("createSharedMutations", () => {
 
     expect(() => {
       store.commit("increment")
-    }).toThrow()
+    }).not.toThrow()
   })
 
   it("allows to use dispatch in main mode", () => {

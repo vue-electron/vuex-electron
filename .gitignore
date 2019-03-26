@@ -3,3 +3,4 @@ node_modules/
 coverage/
 *.iml
 yarn-error.log
+package-lock.json
