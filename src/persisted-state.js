@@ -56,7 +56,7 @@ class PersistedState {
       this.options.storage.get(STORAGE_TEST_KEY)
       this.options.storage.delete(STORAGE_TEST_KEY)
     } catch (error) {
-      throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs.")
+      throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs." + JSON.stringify(error))
     }
   }
 
