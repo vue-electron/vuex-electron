@@ -40,7 +40,7 @@ class PersistedState {
     } else if (typeof filter === "function") {
       return filter
     } else {
-      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`+ JSON.stringify(error))
+      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
     }
   }
 
@@ -56,7 +56,8 @@ class PersistedState {
       this.options.storage.get(STORAGE_TEST_KEY)
       this.options.storage.delete(STORAGE_TEST_KEY)
     } catch (error) {
-      throw new Error("[Vuex Electron] Storage is not valid. Please, read the docs." + JSON.stringify(error))
+      console.error(error);
+      // throw error
     }
   }
 
@@ -103,7 +104,7 @@ export default (options = {}) => (store) => {
   const persistedState = new PersistedState(options, store)
 
   persistedState.loadOptions()
-  persistedState.checkStorage()
+  // persistedState.checkStorage()
   persistedState.loadInitialState()
   !electron.remote && persistedState.subscribeOnChanges()
 }
