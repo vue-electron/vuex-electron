@@ -40,7 +40,7 @@ class PersistedState {
     } else if (typeof filter === "function") {
       return filter
     } else {
-      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`)
+      throw new Error(`[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`+ JSON.stringify(error))
     }
   }
 
