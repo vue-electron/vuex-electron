@@ -101,8 +101,8 @@ class PersistedState {
 
       if (this.options.throttle) {
 		const now = Date.now()
-		if (!last || now > last + this.options.throttle) {
-          last = now
+		if (!lastSetStateDate || now > lastSetStateDate + this.options.throttle) {
+          lastSetStateDate = now
           this.setState(state)
         } else {
           clearTimeout(trailingEventTimeout)
