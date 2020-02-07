@@ -30,7 +30,7 @@ Installation of the Vuex Electron easy as 1-2-3.
 1. Install package with using of [yarn](https://github.com/yarnpkg/yarn) or [npm](https://github.com/npm/cli):
 
     ```
-    yarn install vuex-electron
+    yarn add vuex-electron 
     ```
 
     or
