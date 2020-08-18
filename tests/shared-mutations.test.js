@@ -1,12 +1,12 @@
 import { createStore } from "./helpers"
 
 const ipcMain = {
-  on: () => {}
+  on: () => {},
 }
 
 const ipcRenderer = {
   on: () => {},
-  send: () => {}
+  send: () => {},
 }
 
 describe("createSharedMutations", () => {
@@ -15,8 +15,8 @@ describe("createSharedMutations", () => {
       createStore({
         sharedMutations: {
           ipcMain,
-          ipcRenderer
-        }
+          ipcRenderer,
+        },
       })
     }).not.toThrow()
   })
@@ -27,8 +27,8 @@ describe("createSharedMutations", () => {
         sharedMutations: {
           type: "main",
           ipcMain,
-          ipcRenderer
-        }
+          ipcRenderer,
+        },
       })
     }).not.toThrow()
   })
@@ -39,8 +39,8 @@ describe("createSharedMutations", () => {
         sharedMutations: {
           type: "renderer",
           ipcMain,
-          ipcRenderer
-        }
+          ipcRenderer,
+        },
       })
     }).not.toThrow()
   })
@@ -51,8 +51,8 @@ describe("createSharedMutations", () => {
         sharedMutations: {
           type: "wrong",
           ipcMain,
-          ipcRenderer
-        }
+          ipcRenderer,
+        },
       })
     }).toThrow()
   })
@@ -62,8 +62,8 @@ describe("createSharedMutations", () => {
       sharedMutations: {
         type: "main",
         ipcMain,
-        ipcRenderer
-      }
+        ipcRenderer,
+      },
     })
 
     expect(() => {
@@ -76,8 +76,8 @@ describe("createSharedMutations", () => {
       sharedMutations: {
         type: "renderer",
         ipcMain,
-        ipcRenderer
-      }
+        ipcRenderer,
+      },
     })
 
     expect(() => {
@@ -90,8 +90,8 @@ describe("createSharedMutations", () => {
       sharedMutations: {
         type: "main",
         ipcMain,
-        ipcRenderer
-      }
+        ipcRenderer,
+      },
     })
 
     expect(() => {
@@ -104,8 +104,8 @@ describe("createSharedMutations", () => {
       sharedMutations: {
         type: "renderer",
         ipcMain,
-        ipcRenderer
-      }
+        ipcRenderer,
+      },
     })
 
     expect(() => {
