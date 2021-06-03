@@ -93,8 +93,29 @@ class PersistedState {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
 
-      this.setState(state)
+      let filterState = this.filterSetState(state)
+      this.setState(filterState)
     })
+  }
+
+  filterSetState(state) {
+    let stateBlacklist = this.options.stateBlacklist
+    let obj = {}
+
+    Object.keys(state).forEach(stateKey => {
+
+      Object.keys(state[stateKey]).forEach(itemStateKey => {
+        if(stateBlacklist.includes(itemStateKey)){
+          return
+        }
+        if (!obj[stateKey]) {
+          obj[stateKey] = {}
+        }
+        obj[stateKey][itemStateKey] = state[stateKey][itemStateKey]
+      })
+    })
+
+    return obj
   }
 }
 

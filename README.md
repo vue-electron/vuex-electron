@@ -99,6 +99,18 @@ createPersistedState({
 })
 ```
 
+https://github.com/vue-electron/vuex-electron/issues/19
+``` javascript
+const state = {
+  bar: 0,
+  foo: 1
+}
+
+createPersistedState({
+  stateBlacklist: ['bar']
+})
+```
+
 ### Author
 
 Andrew Emelianenko  
