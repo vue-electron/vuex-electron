@@ -102,10 +102,9 @@ class PersistedState {
     let stateBlacklist = this.options.stateBlacklist
     let obj = {}
 
-    Object.keys(state).forEach(stateKey => {
-
-      Object.keys(state[stateKey]).forEach(itemStateKey => {
-        if(stateBlacklist.includes(itemStateKey)){
+    Object.keys(state).forEach((stateKey) => {
+      Object.keys(state[stateKey]).forEach((itemStateKey) => {
+        if (stateBlacklist.includes(itemStateKey)) {
           return
         }
         if (!obj[stateKey]) {
