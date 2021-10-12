@@ -44,7 +44,7 @@
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-minify": "^0.4.3",
     "bundlesize": "^0.17.0",
-    "electron": "^2.0.8",
+    "electron": "^11.5.0",
     "eslint": "^5.5.0",
     "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-jest": "^21.22.0",
