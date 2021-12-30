@@ -99,7 +99,8 @@ class PersistedState {
   }
 
   filterSetState(state) {
-    let stateBlacklist = this.options.stateBlacklist
+    let stateBlacklist = this.options.stateBlacklist || []
+    let stateWhitelist = this.options.stateWhitelist || []
     let obj = {}
 
     Object.keys(state).forEach((stateKey) => {
@@ -107,6 +108,14 @@ class PersistedState {
         if (stateBlacklist.includes(itemStateKey)) {
           return
         }
+        if (
+          stateWhitelist.length &&
+          stateWhitelist.includes(stateKey) === false &&
+          stateWhitelist.includes(itemStateKey) === false
+        ) {
+          return
+        }
+
         if (!obj[stateKey]) {
           obj[stateKey] = {}
         }
