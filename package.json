@@ -1,6 +1,6 @@
 {
   "name": "vuex-electron",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "Vuex Electron",
   "keywords": [
     "vue",
@@ -35,27 +35,27 @@
     }
   ],
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
     "babel-core": "^7.0.0-0",
     "babel-eslint": "^9.0.0",
     "babel-jest": "^23.6.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-minify": "^0.4.3",
+    "babel-plugin-add-module-exports": "^1.0.4",
+    "babel-preset-minify": "^0.5.1",
     "bundlesize": "^0.17.0",
-    "electron": "^2.0.8",
+    "electron": "^18.0.4",
     "eslint": "^5.5.0",
     "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-jest": "^21.22.0",
     "eslint-plugin-prettier": "^2.6.2",
     "jest": "^23.6.0",
     "prettier": "^1.14.2",
-    "vue": "^2.5.17",
-    "vuex": "^3.0.1"
+    "vue": "^2.6.12",
+    "vuex": "^3.6.2"
   },
   "dependencies": {
     "deepmerge": "^2.1.1",
-    "electron-store": "^2.0.0"
+    "electron-store": "^8.0.1"
   }
 }
