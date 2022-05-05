@@ -30,7 +30,7 @@ class PersistedState {
   }
 
   setState(state) {
-    if (process.type === "browser") {
+    if (process.env.NODE_ENV === "test" || process.type === "browser") {
       this.options.storage.set(this.options.storageKey, state)
     }
   }
