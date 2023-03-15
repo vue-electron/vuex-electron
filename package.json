@@ -14,6 +14,7 @@
   "author": "Andrew Emelianenko <emelianenko.web@gmail.com>",
   "license": "MIT",
   "private": false,
+  "types": "./index.d.ts",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
     "build": "babel src -d dist --env-name production",
