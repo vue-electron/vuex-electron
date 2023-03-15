@@ -73,28 +73,27 @@ Installation of the Vuex Electron easy as 1-2-3.
 
 In renderer process to call actions you need to use `dispatch` or `mapActions`. Don't use `commit` because actions fired via `commit` will not be shared between processes.
 
+### Breaking changes
+
+**[Deprecated]** The whitelist and blacklist features do **not** work, and have been replaced by the ignoredPaths, ignoredCommits and invertIgnored options.
+
 ### Options
 
 Available options for `createPersistedState()`
 
 ```javascript
 createPersistedState({
-  whitelist: ["whitelistedMutation", "anotherWhitelistedMutation"],
-
-  // or
-
-  whitelist: (mutation) => {
-    return true
-  },
-
-  // or
-
-  blacklist: ["ignoredMutation", "anotherIgnoredMutation"],
-
-  // or
-
-  blacklist: (mutation) => {
-    return true
+  // Inverts the ignoredPaths and ignoredCommits settings
+  invertIgnored: true,
+  
+  // Ignores specific paths on the state object, when persisting.
+  ignoredPaths: ["a.path.on.state", "another.path"],
+  
+  // Specifies commits that will not trigger a persistance update.
+  ignoredCommits: ["increment"],
+  // or a variation using a function
+  ignoredCommits: (mutation) => {
+    return true // Return true for mutations that should not trigger an update
   }
 })
 ```
