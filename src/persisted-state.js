@@ -80,7 +80,7 @@ class PersistedState {
   }
 
   loadInitialState() {
-    const state = this.getState(this.options.storage, this.options.storageKey)
+    const state = this.getState()
 
     if (state) {
       const mergedState = merge(this.store.state, state, { arrayMerge: this.combineMerge })
