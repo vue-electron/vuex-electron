@@ -1,6 +1,7 @@
 import merge from "deepmerge"
 import Store from "electron-store"
 
+const SET_STATE_THROTTLE = 0
 const STORAGE_NAME = "vuex"
 const STORAGE_KEY = "state"
 const STORAGE_TEST_KEY = "test"
@@ -14,6 +15,7 @@ class PersistedState {
   loadOptions() {
     if (!this.options.storage) this.options.storage = this.createStorage()
     if (!this.options.storageKey) this.options.storageKey = STORAGE_KEY
+    if (!this.options.throttle) this.options.throttle = SET_STATE_THROTTLE
 
     this.whitelist = this.loadFilter(this.options.whitelist, "whitelist")
     this.blacklist = this.loadFilter(this.options.blacklist, "blacklist")
@@ -28,7 +30,9 @@ class PersistedState {
   }
 
   setState(state) {
-    this.options.storage.set(this.options.storageKey, state)
+    if (process.env.NODE_ENV === "test" || process.type === "browser") {
+      this.options.storage.set(this.options.storageKey, state)
+    }
   }
 
   loadFilter(filter, name) {
@@ -89,11 +93,24 @@ class PersistedState {
   }
 
   subscribeOnChanges() {
+    let lastSetStateDate = 0
+    let trailingEventTimeout = -1
+
     this.store.subscribe((mutation, state) => {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
-
-      this.setState(state)
+      if (this.options.throttle) {
+        const now = Date.now()
+        if (!lastSetStateDate || now > lastSetStateDate + this.options.throttle) {
+          lastSetStateDate = now
+          this.setState(state)
+        } else {
+          clearTimeout(trailingEventTimeout)
+          trailingEventTimeout = setTimeout(() => this.setState(state), this.options.throttle)
+        }
+      } else {
+        this.setState(state)
+      }
     })
   }
 }
