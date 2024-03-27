@@ -64,7 +64,7 @@ class PersistedState {
     const clone = (value, options) => merge(emptyTarget(value), value, options)
     const destination = target.slice()
 
-    source.forEach(function(e, i) {
+    source.forEach(function (e, i) {
       if (typeof destination[i] === "undefined") {
         const cloneRequested = options.clone !== false
         const shouldClone = cloneRequested && options.isMergeableObject(e)

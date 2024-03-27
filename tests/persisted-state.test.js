@@ -55,8 +55,8 @@ describe("createPersistedState", () => {
       createStore({
         persistedState: {
           whitelist: {},
-          storage
-        }
+          storage,
+        },
       })
     }).toThrow()
   })
@@ -67,8 +67,8 @@ describe("createPersistedState", () => {
     const store = createStore({
       persistedState: {
         whitelist: ["increment"],
-        storage
-      }
+        storage,
+      },
     })
 
     store.dispatch("increment")
@@ -86,8 +86,8 @@ describe("createPersistedState", () => {
     const store = createStore({
       persistedState: {
         whitelist: (mutation) => ["increment"].includes(mutation.type),
-        storage
-      }
+        storage,
+      },
     })
 
     store.dispatch("increment")
@@ -106,8 +106,8 @@ describe("createPersistedState", () => {
       createStore({
         persistedState: {
           blacklist: {},
-          storage
-        }
+          storage,
+        },
       })
     }).toThrow()
   })
@@ -118,8 +118,8 @@ describe("createPersistedState", () => {
     const store = createStore({
       persistedState: {
         blacklist: ["increment"],
-        storage
-      }
+        storage,
+      },
     })
 
     store.dispatch("increment")
@@ -137,8 +137,8 @@ describe("createPersistedState", () => {
     const store = createStore({
       persistedState: {
         blacklist: (mutation) => ["increment"].includes(mutation.type),
-        storage
-      }
+        storage,
+      },
     })
 
     store.dispatch("increment")
