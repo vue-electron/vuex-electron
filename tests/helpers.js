@@ -11,7 +11,7 @@ function createStorage() {
   return {
     set: (key, value) => (storage[key] = { ...value }),
     get: (key) => storage[key],
-    delete: (key) => delete storage[key]
+    delete: (key) => delete storage[key],
   }
 }
 
@@ -23,7 +23,7 @@ function createStore(options = {}) {
 
   return new Vuex.Store({
     state: {
-      count: 0
+      count: 0,
     },
     actions: {
       increment({ commit }) {
@@ -32,7 +32,7 @@ function createStore(options = {}) {
 
       decrement({ commit }) {
         commit("decrement")
-      }
+      },
     },
     mutations: {
       increment(state) {
@@ -41,9 +41,9 @@ function createStore(options = {}) {
 
       decrement(state) {
         state.count--
-      }
+      },
     },
-    plugins
+    plugins,
   })
 }
 
