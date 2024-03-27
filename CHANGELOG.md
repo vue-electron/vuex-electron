@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.2.1
+
+- Upgraded dependencies
+
 ### 1.0.3
 
 - Move `electron`, `vue`, and `vuex` to `devDependencies` 
